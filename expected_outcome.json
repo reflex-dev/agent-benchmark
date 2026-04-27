@@ -1,0 +1,12 @@
+{
+  "target_customer_id": 421,
+  "target_customer_name": "Gary Smith",
+  "target_customer_nb_orders": 8,
+  "order_id_to_deliver": 98,
+  "order_reference": "5WUJSYV5",
+  "order_status_before": "ordered",
+  "order_status_after": "delivered",
+  "review_ids_to_accept": [0, 49, 292, 293],
+  "review_status_before": "pending",
+  "review_status_after": "accepted"
+}

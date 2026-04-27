@@ -1,0 +1,33 @@
+{
+  "model": "claude-haiku-4-5-20251001",
+  "use_vision": false,
+  "elapsed_seconds": 92.96,
+  "llm_calls": 3,
+  "input_tokens": 66,
+  "output_tokens": 2290,
+  "cache_read_tokens": 30732,
+  "cache_creation_tokens": 7569,
+  "total_tokens": 2356,
+  "per_call": [
+    {
+      "input": 22,
+      "output": 528,
+      "cache_read": 10244,
+      "cache_creation": 1167
+    },
+    {
+      "input": 22,
+      "output": 750,
+      "cache_read": 10244,
+      "cache_creation": 4470
+    },
+    {
+      "input": 22,
+      "output": 1012,
+      "cache_read": 10244,
+      "cache_creation": 1932
+    }
+  ],
+  "error": null,
+  "final_result": null
+}

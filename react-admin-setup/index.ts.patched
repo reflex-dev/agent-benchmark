@@ -1,0 +1,25 @@
+import type { Category } from './categories';
+import type { Product } from './products';
+import type { Order, BasketItem } from './orders';
+import type { Customer } from './customers';
+import type { Invoice } from './invoices';
+import type { Review } from './reviews';
+import type { Db } from './types';
+
+import seedData from './seed.json';
+
+const generateData = (): Db => {
+    return seedData as unknown as Db;
+};
+
+export default generateData;
+export type {
+    BasketItem,
+    Category,
+    Order,
+    Customer,
+    Db,
+    Invoice,
+    Product,
+    Review,
+};

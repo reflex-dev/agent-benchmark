@@ -1,0 +1,21 @@
+{
+  "model": "claude-haiku-4-5-20251001",
+  "use_vision": true,
+  "elapsed_seconds": 87.75,
+  "llm_calls": 1,
+  "input_tokens": 2390,
+  "output_tokens": 614,
+  "cache_read_tokens": 0,
+  "cache_creation_tokens": 10244,
+  "total_tokens": 3004,
+  "per_call": [
+    {
+      "input": 2390,
+      "output": 614,
+      "cache_read": 0,
+      "cache_creation": 10244
+    }
+  ],
+  "error": null,
+  "final_result": null
+}

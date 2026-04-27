@@ -1,0 +1,5 @@
+reflex>=0.9.0
+reflex-enterprise>=0.7.1
+anthropic>=0.42.0
+requests>=2.31.0
+pyyaml>=6.0
