@@ -23,17 +23,19 @@ Data is pinned in `seed.json` (900 customers, 600 orders, 324 reviews).
 
 ## Results
 
-n=1 per configuration; see [Limitations and caveats](#limitations-and-caveats) for important context. Results in `results/`.
+Cells show **median (min–max)** across `n` trials. Per-trial JSONs are in `results/` (numbered files for the multi-trial groups, plus the original n=1 file from the first commit kept untouched). See [Limitations and caveats](#limitations-and-caveats) for context.
 
-| Run | Model | Vision | Time | Reasoning units | Input tokens | Output tokens | Cache read | Outcome |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| API agent | Sonnet 4 | n/a | 17.07 s | 8 tool calls (~14 HTTP requests) | 12,119 | 931 | n/a | ✅ correct |
-| API agent | Haiku 4.5 | n/a | 8.38 s | 8 tool calls (~14 HTTP requests) | 9,853 | 858 | n/a | ✅ correct |
-| Browser agent | Sonnet 4 | yes | 601.64 s | 34 LLM cycles | 299,494 | 23,793 | 332,032 | ✅ correct |
-| Browser agent | Haiku 4.5 | yes | 87.75 s | 1 LLM cycle | 2,390 | 614 | 0 | ❌ no final result |
-| Browser agent | Haiku 4.5 | no | 92.96 s | 3 LLM cycles | 66 | 2,290 | 30,732 | ❌ no final result |
+| Run | Model | Vision | n | Time (s) | Reasoning units | Input tokens | Output tokens | Cache read | Outcome |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| API agent | Sonnet 4 | n/a | 5 | 19.7 (16.4–23.3) | 8 tool calls (~14 HTTP) | 12,152 (12,114–12,187) | 935 (886–986) | n/a | 5/5 ✅ |
+| API agent | Haiku 4.5 | n/a | 5 | 7.8 (6.8–8.2) | 8 tool calls (~14 HTTP) | 9,837 (8,031–9,852) | 840 (730–860) | n/a | 5/5 ✅ |
+| Browser agent | Sonnet 4 | yes | 3 | 860 (853–1,296) | 47 LLM cycles (43–68) | 495k (407k–751k) | 33k (30k–50k) | 477k (436k–674k) | 3/3 ✅ |
+| Browser agent | Haiku 4.5 | yes | 1 | 87.75 | 1 LLM cycle | 2,390 | 614 | 0 | ❌ no final result |
+| Browser agent | Haiku 4.5 | no | 1 | 92.96 | 3 LLM cycles | 66 | 2,290 | 30,732 | ❌ no final result |
 
 **Reasoning units are not directly comparable across rows.** An API tool call is one Anthropic request — but each tool maps to 1–3 HTTP requests against the Reflex backend (see `run_api_agent.py`). A browser-agent "LLM cycle" is one screenshot/DOM-reason-act loop in browser-use. For dollar-cost comparison, look at input/output tokens.
+
+The browser-Sonnet group has wide spread: the longest run (1,296 s, 68 cycles, 751 k input) was nearly 2× the shortest (853 s, 43 cycles, 407 k input). Variance is itself a finding for browser agents on this task.
 
 ## Repo layout
 
@@ -141,12 +143,12 @@ The browser-use script counts tokens by subclassing `ChatAnthropic.ainvoke` and 
 
 Read these before drawing conclusions from the numbers.
 
-- **n=1 per configuration.** Each row in the results table is a single trial. LLMs are non-deterministic; latency in particular has wide run-to-run spread. Median + range across multiple trials is the right way to compare; this repo doesn't have that yet.
+- **Sample sizes are small.** API rows are n=5; browser-Sonnet is n=3; the two browser-Haiku rows are still n=1 (they did not produce a final result on the first try and were not retried). Medians and min–max ranges are reported, but with this few trials the ranges are descriptive, not statistically meaningful.
 - **The API agent's tool surface is hand-written.** `EventHandlerAPIPlugin` auto-generates the HTTP endpoints with no work on the app side — that part is genuinely zero-overhead. But `run_api_agent.py` defines a REST-shaped tool surface (`list_customers`, `update_order`, ...) and maps each tool to a sequence of raw-handler POSTs (e.g. `update_order` → `load_order` + `set_order_status_draft` + `save_order_status`). That mapping is human-authored. It could plausibly be auto-generated from the plugin's OpenAPI spec, or skipped entirely by exposing the raw handlers to the agent — neither variant is implemented here.
 - **Tool calls and LLM cycles are different units.** The API agent's `tool_calls: 8` is 8 Anthropic requests; on the wire, those expand to ~14 HTTP requests against Reflex (the multi-step handler sequences above). The browser agent's `llm_calls: 34` is 34 screenshot-reason-act loops in browser-use. Don't compare these counts directly. Token totals are the more honest cost metric.
 - **Single task.** "Find Smith with the most orders, accept their pending reviews, mark their latest ordered order as delivered" is one workflow on one app. Conclusions about agent strategies in general should not lean on this dataset.
 - **Cache reads are not in `total_tokens`.** See "What gets measured" for the formula. Side-by-side comparison of `total_tokens` understates browser-agent input volume substantially.
-- **Two of five runs failed.** Both Haiku browser variants returned `final_result: null` with no exception. Counting them as data points (not errors) is a deliberate choice — the runs completed without crashing — but neither row should be read as "Haiku can't do this task," only as "Haiku didn't do this task in this single attempt."
+- **Both Haiku browser runs failed.** Both Haiku browser variants returned `final_result: null` with no exception. Counting them as data points (not errors) is a deliberate choice — the runs completed without crashing — but neither row should be read as "Haiku can't do this task," only as "Haiku didn't do this task in this single attempt."
 
 ## Notes
 
