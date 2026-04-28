@@ -23,19 +23,19 @@ Data is pinned in `seed.json` (900 customers, 600 orders, 324 reviews).
 
 ## Results
 
-Cells show **median (min–max)** across `n` trials. Per-trial JSONs are in `results/` (numbered files for the multi-trial groups, plus the original n=1 file from the first commit kept untouched). See [Limitations and caveats](#limitations-and-caveats) for context.
+Cells show **mean ± sample standard deviation (n−1)** across `n` trials, with min–max ranges noted in the caveat below for context. Per-trial JSONs are in `results/` (numbered files for the multi-trial groups, plus the original n=1 file from the first commit kept untouched). See [Limitations and caveats](#limitations-and-caveats) for context.
 
 | Run | Model | Vision | n | Time (s) | Reasoning units | Input tokens | Output tokens | Cache read | Outcome |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| API agent | Sonnet 4 | n/a | 5 | 19.7 (16.4–23.3) | 8 tool calls (~14 HTTP) | 12,152 (12,114–12,187) | 935 (886–986) | n/a | 5/5 ✅ |
-| API agent | Haiku 4.5 | n/a | 5 | 7.8 (6.8–8.2) | 8 tool calls (~14 HTTP) | 9,837 (8,031–9,852) | 840 (730–860) | n/a | 5/5 ✅ |
-| Browser agent | Sonnet 4 | yes | 3 | 860 (853–1,296) | 47 LLM cycles (43–68) | 495k (407k–751k) | 33k (30k–50k) | 477k (436k–674k) | 3/3 ✅ |
+| API agent | Sonnet 4 | n/a | 5 | 19.7 ± 2.8 | 8 ± 0 tool calls (~14 HTTP) | 12,151 ± 27 | 934 ± 41 | n/a | 5/5 ✅ |
+| API agent | Haiku 4.5 | n/a | 5 | 7.7 ± 0.5 | 8 ± 0 tool calls (~14 HTTP) | 9,478 ± 809 | 819 ± 52 | n/a | 5/5 ✅ |
+| Browser agent | Sonnet 4 | yes | 3 | 1003 ± 254 | 53 ± 13 LLM cycles | 550,976 ± 178,849 | 37,962 ± 10,850 | 529,176 ± 127,502 | 3/3 ✅ |
 | Browser agent | Haiku 4.5 | yes | 1 | 87.75 | 1 LLM cycle | 2,390 | 614 | 0 | ❌ no final result |
 | Browser agent | Haiku 4.5 | no | 1 | 92.96 | 3 LLM cycles | 66 | 2,290 | 30,732 | ❌ no final result |
 
 **Reasoning units are not directly comparable across rows.** An API tool call is one Anthropic request — but each tool maps to 1–3 HTTP requests against the Reflex backend (see `run_api_agent.py`). A browser-agent "LLM cycle" is one screenshot/DOM-reason-act loop in browser-use. For dollar-cost comparison, look at input/output tokens.
 
-The browser-Sonnet group has wide spread: the longest run (1,296 s, 68 cycles, 751 k input) was nearly 2× the shortest (853 s, 43 cycles, 407 k input). Variance is itself a finding for browser agents on this task.
+The browser-Sonnet group has wide spread: the longest run was 1,296 s / 68 cycles / 751k input tokens; the shortest was 853 s / 43 cycles / 407k input — nearly a 2× range across just 3 trials. The large standard deviations on every browser metric reflect this. API runs were tight by comparison: API Sonnet hit 8 tool calls every trial and varied ±27 input tokens.
 
 ## Repo layout
 
